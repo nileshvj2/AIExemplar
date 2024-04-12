@@ -1,40 +1,40 @@
 import streamlit as st
 import requests
 import pandas as pd
-import json
+# import json
 import openai
-import inspect
+# import inspect
 import azure.cognitiveservices.speech as speechsdk
 import pyodbc
-from langchain.agents import AgentType
-from langchain_experimental.agents import create_pandas_dataframe_agent
-from langchain.callbacks import StreamlitCallbackHandler
-from langchain.chat_models import ChatOpenAI
-from langchain.chat_models import AzureChatOpenAI
-from langchain.agents import create_sql_agent
+# from langchain.agents import AgentType
+# from langchain_experimental.agents import create_pandas_dataframe_agent
+# from langchain.callbacks import StreamlitCallbackHandler
+# from langchain.chat_models import ChatOpenAI
+# from langchain.chat_models import AzureChatOpenAI
+# from langchain.agents import create_sql_agent
 # from langchain.agents.agent_toolkits import SQLDatabaseToolkit
 # from langchain import SQLDatabase
 # from langchain_experimental.sql import SQLDatabaseChain
 # from langchain_experimental.sql import SQLDatabaseSequentialChain
-from langchain.agents import AgentExecutor
-from langchain.callbacks.manager import CallbackManager
+# from langchain.agents import AgentExecutor
+# from langchain.callbacks.manager import CallbackManager
 import streamlit as st
 import pandas as pd
 import os
 from dotenv import load_dotenv
-import semantic_kernel as sk
-from semantic_kernel.connectors.ai.open_ai import (
-    AzureChatCompletion,
-    AzureTextEmbedding,
-)
-from semantic_kernel.memory.semantic_text_memory import SemanticTextMemory
-from semantic_kernel.core_plugins.text_memory_plugin import TextMemoryPlugin
-from semantic_kernel.connectors.memory.azure_cosmosdb import (
-    AzureCosmosDBMemoryStore,
-)
-from semantic_kernel.memory.semantic_text_memory import SemanticTextMemory
-from semantic_kernel.memory.memory_store_base import MemoryStoreBase
-import asyncio
+# import semantic_kernel as sk
+# from semantic_kernel.connectors.ai.open_ai import (
+#     AzureChatCompletion,
+#     AzureTextEmbedding,
+# )
+# from semantic_kernel.memory.semantic_text_memory import SemanticTextMemory
+# from semantic_kernel.core_plugins.text_memory_plugin import TextMemoryPlugin
+# from semantic_kernel.connectors.memory.azure_cosmosdb import (
+#     AzureCosmosDBMemoryStore,
+# )
+# from semantic_kernel.memory.semantic_text_memory import SemanticTextMemory
+# from semantic_kernel.memory.memory_store_base import MemoryStoreBase
+# import asyncio
 import time
 
 st.set_page_config(layout="wide")
@@ -49,6 +49,7 @@ aoai_endpoint = os.environ["AZURE_OPENAI_ENDPOINT"]
 aoai_api_key = os.environ["AZURE_OPENAI_API_KEY"]
 deployment_name = os.environ["AZURE_OPENAI_DEPLOYMENT_NAME"]
 aoai_api_version = os.environ["AZURE_OPENAI_API_VERSION"]
+aoai_api_version_For_COSMOS = "2023-08-01-preview"        #### for cosmos other API version doesnt work. Hence this is not using env variable API version for cosmos
 aoai_embedding_deployment = os.environ["AZURE_EMBEDDING_MODEL"]
 
 
@@ -198,142 +199,142 @@ def handle_chat_sql_langchain(prompt, db_chain):
     return db_chain(prompt)['result']
 
 
-def upsert_data_to_memory_store(
-    memory: SemanticTextMemory, store: MemoryStoreBase, data_file_path: str
-) -> None:
-    """
-    This asynchronous function takes two memory stores and a data file path as arguments.
-    It is designed to upsert (update or insert) data into the memory stores from the data file.
+# def upsert_data_to_memory_store(
+#     memory: SemanticTextMemory, store: MemoryStoreBase, data_file_path: str
+# ) -> None:
+#     """
+#     This asynchronous function takes two memory stores and a data file path as arguments.
+#     It is designed to upsert (update or insert) data into the memory stores from the data file.
 
-    Args:
-        kernel_memory_store (callable): A callable object that represents the kernel memory store where data will be upserted.
-        memory_store (callable): A callable object that represents the memory store where data will be upserted.
-        data_file_path (str): The path to the data file that contains the data to be upserted.
+#     Args:
+#         kernel_memory_store (callable): A callable object that represents the kernel memory store where data will be upserted.
+#         memory_store (callable): A callable object that represents the memory store where data will be upserted.
+#         data_file_path (str): The path to the data file that contains the data to be upserted.
 
-    Returns:
-        None. The function performs an operation that modifies the memory stores in-place.
-    """
-    with open(file=data_file_path, mode="r", encoding="utf-8-sig") as f:        
-        #raw_data = json.load(f)
-        data=json.load(f)
-        n = 0
-        for item in data:
-            n += 1
-            # check if the item already exists in the memory store
-            # if the id doesn't exist, it throws an exception
-            try:
-                already_created = bool(
-                    store.get(
-                        collection_name, item["id"], with_embedding=True
-                    )
-                )
-            except Exception:
-                already_created = False
-            # if the record doesn't exist, we generate embeddings and save it to the database
-            if not already_created:
-                memory.save_information(
-                    collection=collection_name,
-                    id=int(item["id"]),
-                    # the embedding is generated from the text field
-                    text=item["content"],
-                    description=item["title"],
-                )
-                print(
-                    "Generating embeddings and saving new item:",
-                    n,
-                    "/",
-                    len(data),
-                    end="\r",
-                )
-            else:
-                print("Skipping item already exits:", n, "/", len(data), end="\r")
+#     Returns:
+#         None. The function performs an operation that modifies the memory stores in-place.
+#     """
+#     with open(file=data_file_path, mode="r", encoding="utf-8-sig") as f:        
+#         #raw_data = json.load(f)
+#         data=json.load(f)
+#         n = 0
+#         for item in data:
+#             n += 1
+#             # check if the item already exists in the memory store
+#             # if the id doesn't exist, it throws an exception
+#             try:
+#                 already_created = bool(
+#                     store.get(
+#                         collection_name, item["id"], with_embedding=True
+#                     )
+#                 )
+#             except Exception:
+#                 already_created = False
+#             # if the record doesn't exist, we generate embeddings and save it to the database
+#             if not already_created:
+#                 memory.save_information(
+#                     collection=collection_name,
+#                     id=int(item["id"]),
+#                     # the embedding is generated from the text field
+#                     text=item["content"],
+#                     description=item["title"],
+#                 )
+#                 print(
+#                     "Generating embeddings and saving new item:",
+#                     n,
+#                     "/",
+#                     len(data),
+#                     end="\r",
+#                 )
+#             else:
+#                 print("Skipping item already exits:", n, "/", len(data), end="\r")
 
-async def vectorsearch_mongo_cosmosdb(kernel, prompt):       
+# async def vectorsearch_mongo_cosmosdb(kernel, prompt):       
 
-    # adding azure openai chat service
-    kernel.add_service(
-        AzureChatCompletion(
-            service_id="chat_completion",
-            deployment_name=deployment_name,
-            endpoint=aoai_endpoint,
-            api_key=aoai_api_key,
-        )
-    )
+#     # adding azure openai chat service
+#     kernel.add_service(
+#         AzureChatCompletion(
+#             service_id="chat_completion",
+#             deployment_name=deployment_name,
+#             endpoint=aoai_endpoint,
+#             api_key=aoai_api_key,
+#         )
+#     )
 
-    # adding azure openai text embedding service
-    kernel.add_service(
-        AzureTextEmbedding(
-            service_id="text_embedding",
-            deployment_name=aoai_embedding_deployment,
-            endpoint=aoai_endpoint,
-            api_key=aoai_api_key,
-        )
-    )
+#     # adding azure openai text embedding service
+#     kernel.add_service(
+#         AzureTextEmbedding(
+#             service_id="text_embedding",
+#             deployment_name=aoai_embedding_deployment,
+#             endpoint=aoai_endpoint,
+#             api_key=aoai_api_key,
+#         )
+#     )
     
 
 
-    #store = AzureCosmosDBMemoryStore.get(collection_name=COSMOS_MONGO_CONTAINER, with_embedding=True)
-    # create azure cosmos db for mongo db vcore api store and collection with vector ivf
-    # currently, semantic kernel only supports the ivf vector kind
-    store = AzureCosmosDBMemoryStore.create(
-        cosmos_connstr=COSMOS_MONGO_CONNECTIONSTRING,
-        cosmos_api=COSMOS_MONGO_API,
-        database_name=COSMOS_MONGO_DBNAME,
-        collection_name=collection_name,
-        index_name=index_name,
-        vector_dimensions=vector_dimensions,
-        num_lists=num_lists,
-        similarity=similarity,
-    )
+#     #store = AzureCosmosDBMemoryStore.get(collection_name=COSMOS_MONGO_CONTAINER, with_embedding=True)
+#     # create azure cosmos db for mongo db vcore api store and collection with vector ivf
+#     # currently, semantic kernel only supports the ivf vector kind
+#     store = AzureCosmosDBMemoryStore.create(
+#         cosmos_connstr=COSMOS_MONGO_CONNECTIONSTRING,
+#         cosmos_api=COSMOS_MONGO_API,
+#         database_name=COSMOS_MONGO_DBNAME,
+#         collection_name=collection_name,
+#         index_name=index_name,
+#         vector_dimensions=vector_dimensions,
+#         num_lists=num_lists,
+#         similarity=similarity,
+#     )
 
 
-    memory = SemanticTextMemory(storage=store, embeddings_generator=kernel.get_service("text_embedding"))
-    kernel.import_plugin_from_object(TextMemoryPlugin(memory), "TextMemoryPluginACDB")
+#     memory = SemanticTextMemory(storage=store, embeddings_generator=kernel.get_service("text_embedding"))
+#     kernel.import_plugin_from_object(TextMemoryPlugin(memory), "TextMemoryPluginACDB")
      
-    #print("Upserting data to Azure Cosmos DB Memory Store...")
-    upsert_data_to_memory_store(memory, store, "data/BikeProductWDescription.json")
+#     #print("Upserting data to Azure Cosmos DB Memory Store...")
+#     upsert_data_to_memory_store(memory, store, "data/BikeProductWDescription.json")
 
-    result = await memory.search(collection_name, prompt) 
+#     result = await memory.search(collection_name, prompt) 
     
-    # task1 = asyncio.create_task(memory.search(collection_name, prompt))
+#     # task1 = asyncio.create_task(memory.search(collection_name, prompt))
 
-    # done, pending = asyncio.wait(task1,timeout=None, return_when=ALL_COMPLETED)
-    # if task1 in done:
-    #     result = task1.result()        
-    return result
+#     # done, pending = asyncio.wait(task1,timeout=None, return_when=ALL_COMPLETED)
+#     # if task1 in done:
+#     #     result = task1.result()        
+#     return result
 
-def get_skOpenAI_response(kernel, prompthistory, result):
-    import semantic_kernel.connectors.ai.open_ai as sk_oai
+# def get_skOpenAI_response(kernel, prompthistory, result):
+#     import semantic_kernel.connectors.ai.open_ai as sk_oai
 
-    execution_settings = sk_oai.OpenAITextPromptExecutionSettings(
-    service_id="chat_completion",
-        ai_model_id=deployment_name,
-        max_tokens=1000,
-        temperature=0.0    
-    )
+#     execution_settings = sk_oai.OpenAITextPromptExecutionSettings(
+#     service_id="chat_completion",
+#         ai_model_id=deployment_name,
+#         max_tokens=1000,
+#         temperature=0.0    
+#     )
 
-    from semantic_kernel.prompt_template.input_variable import InputVariable
+#     from semantic_kernel.prompt_template.input_variable import InputVariable
 
-    chat_prompt_template_config = sk.PromptTemplateConfig(
-        template=prompthistory,
-        name="grounded_response",
-        template_format="semantic-kernel",
-        input_variables=[
-            InputVariable(name="db_record", description="The database record", is_required=True),
-            InputVariable(name="query_term", description="The user input", is_required=True),
-        ],
-        execution_settings=execution_settings
-    )
+#     chat_prompt_template_config = sk.PromptTemplateConfig(
+#         template=prompthistory,
+#         name="grounded_response",
+#         template_format="semantic-kernel",
+#         input_variables=[
+#             InputVariable(name="db_record", description="The database record", is_required=True),
+#             InputVariable(name="query_term", description="The user input", is_required=True),
+#         ],
+#         execution_settings=execution_settings
+#     )
 
-    chat_function = kernel.create_function_from_prompt(
-    prompt=prompthistory,
-    function_name= "ChatGPTFunc", plugin_name="chatGPTPlugin", prompt_template_config=chat_prompt_template_config, 
-    )
+#     chat_function = kernel.create_function_from_prompt(
+#     prompt=prompthistory,
+#     function_name= "ChatGPTFunc", plugin_name="chatGPTPlugin", prompt_template_config=chat_prompt_template_config, 
+#     )
 
-    completions_result = kernel.invoke(chat_function, sk.KernelArguments(query_term="Give me what context you have. Now using this knowledge answer this: " + prompthistory, db_record=result[0].text))
-    return completions_result
+#     completions_result = kernel.invoke(chat_function, sk.KernelArguments(query_term="Give me what context you have. Now using this knowledge answer this: " + prompthistory, db_record=result[0].text))
+#     return completions_result
 
-async def handle_chat_cosmos(prompt):
+def handle_chat_cosmos(prompt):
     # Echo the user's prompt to the chat window
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
@@ -344,19 +345,90 @@ async def handle_chat_cosmos(prompt):
         message_placeholder = st.empty()
         full_response = ""
 
+        #Semantic Kernel Approach - 1
          # Intialize the kernel
-        kernel = sk.Kernel()
-
-        result = await vectorsearch_mongo_cosmosdb(kernel, prompt)
-        response = get_skOpenAI_response(kernel, prompt, result) 
-        response_message = response.choices[0].message
+        #kernel = sk.Kernel()
+        #result = asyncio.run(vectorsearch_mongo_cosmosdb(kernel, prompt))
+        #response = get_skOpenAI_response(kernel, prompt, result) 
+        
+        response_message = "" #response.choices[0].message
         full_response += ("" + response_message.content + "\n" or "")        
         message_placeholder.markdown(full_response)        
         st.markdown(full_response)
 
         st.session_state.messages.append({"role": "assistant", "content": full_response})
 
-    return ""
+### 02: Chat with customer data
+def create_chat_cosmos(messages):
+    # Create an Azure OpenAI client. We create it in here because each exercise will
+    # require at a minimum different base URLs.
+
+    client = openai.AzureOpenAI(        
+        base_url=f"{aoai_endpoint}/openai/deployments/{deployment_name}/extensions/",
+        api_key=aoai_api_key,
+        api_version=aoai_api_version_For_COSMOS
+    )
+    
+    # Create and return a new chat completion request
+    # Be sure to include the "extra_body" parameter to use Cosmos as the data source
+    #this is Azure Open AI On your data feature
+
+    return client.chat.completions.create(
+        model=deployment_name,
+        messages=[
+            {"role": m["role"], "content": m["content"]}
+            for m in messages
+        ],
+        stream=True,
+        extra_body={
+            "dataSources": [
+                {
+                    "type": "AzureCosmosDB",
+                    "parameters": {
+                        "connectionString": COSMOS_MONGO_CONNECTIONSTRING,
+                        "indexName": index_name,
+                        "containerName": COSMOS_MONGO_CONTAINER,
+                        "databaseName": COSMOS_MONGO_DBNAME,
+                        "fieldsMapping": {
+                            "contentFieldsSeparator": "\n",
+                            "contentFields": ["text"],
+                            "filepathField": "id",
+                            "titleField": "description",
+                            "urlField": None,
+                            "vectorFields": ["embedding"],
+                        },
+                        "inScope": "true",
+                        "roleInformation": "You are an AI assistant that helps people find information from retrieved data",
+                        "embeddingEndpoint": f"{aoai_endpoint}/openai/deployments/{aoai_embedding_deployment}/embeddings/",
+                        "embeddingKey": aoai_api_key,
+                        "strictness": 3,
+                        "topNDocuments": 5,
+                    }
+                }
+            ]
+        }
+    )
+
+
+def handle_chat_cosmos(prompt):
+    # Echo the user's prompt to the chat window
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Send the user's prompt to Azure OpenAI and display the response
+    # The call to Azure OpenAI is handled in create_chat_completion()
+    # This function loops through the responses and displays them as they come in.
+    # It also appends the full response to the chat history.
+
+    with st.chat_message("assistant"):
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in create_chat_cosmos(st.session_state.messages):
+            full_response += (response.choices[0].delta.content or "")
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
 
 def handle_prompt(chat_option, prompt):
     if chat_option == "SQL DB":
@@ -364,7 +436,8 @@ def handle_prompt(chat_option, prompt):
     # elif chat_option == "QA over SQL DB(Lang chain)":
     #     handle_chat_sql_langchain(prompt)
     elif chat_option == "Cosmos DB":
-        st.write("<h6 style='text-align: center; color: red;'>This feature is not yet implemented.</h5>", unsafe_allow_html=True)
+        #st.write("<h6 style='text-align: center; color: red;'>This feature is not yet implemented.</h5>", unsafe_allow_html=True)
+        handle_chat_cosmos(prompt)        
         #asyncio.run(handle_chat_cosmos(prompt))
     else:
         st.write("Please select a chat option before calling the chatbot.")
@@ -387,7 +460,10 @@ def main():
 
     """
     )
-    tooltip_text = "SQL DB Examples:  \nList all Bicycle products, along with their prices;  \nWhich is the cheapest product  \nList 10 products from BikeStores alongwith their prices for Electra brand  \nList customers in New York city?  \nList all products in BikeStores with list price and category"
+    tooltip_text = """SQL DB Examples:  \nList all Bicycle products, along with their prices;  \nWhich is the cheapest product  \nList 10 products from BikeStores alongwith their prices for Electra brand  \nList customers in New York city?  \nList all products in BikeStores with list price and category
+                      \n  \n Cosmos DB Examples:  \nGive me details about 2017 Trek Fuel EX 5 27.5 Plus  \nWhich bike is better for mountain biking  \nlist few high-performance electric bike along with their list price  \nWhat is list price of Surly Straggler bike  \nwhich bike is good option for kids  \nwhich road bikes are engineered for speed and comfort both? 
+
+                   """
     chat_option = st.radio(label="Choose the chat option you want to try:", options=["SQL DB", "Cosmos DB"], help=tooltip_text, on_change=option_changed)
 
     # Initialize chat history
