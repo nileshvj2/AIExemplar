@@ -1,6 +1,7 @@
 # AI Exemplar 
 
-This project serves as a proof of concept for Azure OpenAI and other AI functionalities in Azure. The project is not intended to be a production-ready application, but rather a starting point for exploring the Azure AI journey and understanding the capabilities of Azure AI services. The POCs developed through this project will demonstrate the potential of Azure AI and serve as a foundation for potential use cases and projects.
+This project serves as a collection of proof-of-concept for Azure OpenAI and other AI functionalities within Azure. It demonstrates various use cases, design patterns, and implementation options. The goal is to provide a foundation for architects and AI enthusiast to explore the potential of Azure AI and make informed decisions about solution approaches. 
+The site map (chart) illustrates various use cases, including Q&A over enterprise data, classification, and call center applications etc. These use cases leverage diverse data sources such as SQL DB, Cosmos DB, PDF files, CSV files, and Delta Lake etc. The primary goal of this project is not only to showcase different use cases but also to explore various implementation options. By considering different approaches, the architects and AI enthusiast can gain insights into the pros, cons, and complexities associated with each solution. For instance, comparing techniques like Lang chain versus Semantic Kernel or choosing between building Q&A systems over Delta Lake using SQL endpoint versus Vector search methods and many more scenarios.
 
 Use the navigation bar on the left to navigate to the different option pages And then choose radio buttons to choose subcategory.
 
